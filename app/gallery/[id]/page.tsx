@@ -1,64 +1,69 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import { notFound } from "next/navigation"
-import type { Metadata } from "next"
-import { ArrowLeft, Calendar, MapPin, Ruler, Scissors, Layers } from "lucide-react"
+import { useParams } from "next/navigation"
+import { useRef } from "react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
+import { motion, useScroll, useTransform } from "framer-motion"
 import SiteHeader from "@/components/site-header"
 import SiteFooter from "@/components/site-footer"
 import { works, getWorkById } from "@/lib/data"
+import { FadeIn } from "@/components/motion"
+import { PageTransition } from "@/components/page-transition"
 
-export function generateStaticParams() {
-  return works.map((w) => ({ id: w.id }))
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}): Promise<Metadata> {
-  const { id } = await params
+export default function GalleryDetailPage() {
+  const params = useParams()
+  const id = params.id as string
   const work = getWorkById(id)
-  if (!work) return { title: "作品未找到 - 羌绣传承" }
-  return {
-    title: `${work.title} - 作品展览 - 羌绣传承`,
-    description: work.description,
+  const heroRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  })
+  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.1])
+
+  if (!work) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+        <p className="text-muted-foreground">{"作品未找到"}</p>
+        <Link href="/gallery" className="mt-4 text-sm text-foreground underline underline-offset-4">{"返回作品展览"}</Link>
+      </div>
+    )
   }
-}
-
-export default async function GalleryDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const work = getWorkById(id)
-  if (!work) notFound()
 
   const relatedWorks = work.detail.relatedIds
     .map((rid) => works.find((w) => w.id === rid))
     .filter(Boolean)
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main className="flex-1">
-        <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
-          {/* Breadcrumb */}
-          <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
-            <Link href="/gallery" className="flex items-center gap-1.5 transition-colors hover:text-foreground">
-              <ArrowLeft className="h-4 w-4" />
-              {"返回作品展览"}
-            </Link>
-            <span>{"/"}</span>
-            <span className="text-foreground">{work.title}</span>
-          </nav>
+  const specs = [
+    { label: "尺寸", value: work.detail.dimensions },
+    { label: "材料", value: work.detail.material },
+    { label: "绣法", value: work.detail.technique },
+    { label: "产地", value: work.detail.origin },
+  ]
 
-          {/* Main Content */}
-          <div className="flex flex-col gap-10 lg:flex-row">
-            {/* Image */}
-            <div className="w-full lg:w-1/2">
-              <div className="sticky top-24 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-                <div className="relative aspect-square">
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <main>
+        <PageTransition>
+          <div className="px-6 pt-32 pb-20 md:px-12 lg:px-20">
+            {/* Back link */}
+            <FadeIn>
+              <Link
+                href="/gallery"
+                className="line-reveal inline-flex items-center gap-2 pb-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                {"返回作品展览"}
+              </Link>
+            </FadeIn>
+
+            {/* Hero image - full width with parallax zoom */}
+            <FadeIn className="mt-8">
+              <div ref={heroRef} className="relative aspect-video w-full overflow-hidden rounded-2xl">
+                <motion.div className="relative w-full h-full" style={{ scale: imgScale }}>
                   <Image
                     src={work.src}
                     alt={work.title}
@@ -66,115 +71,87 @@ export default async function GalleryDetailPage({
                     className="object-cover"
                     priority
                   />
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </FadeIn>
 
-            {/* Details */}
-            <div className="w-full lg:w-1/2">
-              <div className="flex items-center gap-3">
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                  {work.category}
-                </span>
-                <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {work.year}
-                </span>
-              </div>
-
-              <h1 className="mt-4 text-3xl font-bold text-foreground font-serif sm:text-4xl">
-                {work.title}
-              </h1>
-
-              {/* Artist */}
-              <div className="mt-5 flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                  {work.artist.charAt(0)}
+            {/* Title & meta */}
+            <div className="mx-auto mt-16 max-w-3xl">
+              <FadeIn>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">{work.category}</p>
+                <h1 className="mt-4 text-4xl font-medium tracking-tight text-foreground md:text-5xl">
+                  {work.title}
+                </h1>
+                <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+                  <span>{work.artist}</span>
+                  <span>{"·"}</span>
+                  <span>{work.year}</span>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-card-foreground">{work.artist}</p>
-                  <p className="text-xs text-muted-foreground">{"非遗传承人"}</p>
-                </div>
-              </div>
+              </FadeIn>
 
               {/* Story */}
-              <div className="mt-6">
-                <h2 className="mb-3 text-lg font-semibold text-foreground">{"作品故事"}</h2>
-                <p className="leading-relaxed text-muted-foreground">
+              <FadeIn delay={0.1} className="mt-12">
+                <p className="text-lg leading-relaxed text-muted-foreground">
                   {work.detail.story}
                 </p>
-              </div>
+              </FadeIn>
 
-              {/* Specs */}
-              <div className="mt-8 grid grid-cols-2 gap-4">
-                <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4">
-                  <Ruler className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{"尺寸"}</p>
-                    <p className="mt-0.5 text-sm font-medium text-card-foreground">{work.detail.dimensions}</p>
-                  </div>
+              {/* Specs grid */}
+              <FadeIn delay={0.2} className="mt-16">
+                <div className="grid grid-cols-2 gap-px border border-border rounded-2xl overflow-hidden bg-border md:grid-cols-4">
+                  {specs.map((item) => (
+                    <div key={item.label} className="bg-background p-6 text-center transition-colors hover:bg-muted/50">
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground">{item.label}</p>
+                      <p className="mt-2 text-sm font-medium text-foreground">{item.value}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4">
-                  <Layers className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{"材料"}</p>
-                    <p className="mt-0.5 text-sm font-medium text-card-foreground">{work.detail.material}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4">
-                  <Scissors className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{"绣法"}</p>
-                    <p className="mt-0.5 text-sm font-medium text-card-foreground">{work.detail.technique}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4">
-                  <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{"产地"}</p>
-                    <p className="mt-0.5 text-sm font-medium text-card-foreground">{work.detail.origin}</p>
-                  </div>
-                </div>
-              </div>
+              </FadeIn>
             </div>
-          </div>
 
-          {/* Related Works */}
-          {relatedWorks.length > 0 && (
-            <section className="mt-16 border-t border-border pt-12">
-              <h2 className="mb-6 text-2xl font-bold text-foreground font-serif">{"相关作品"}</h2>
-              <div className="grid gap-6 sm:grid-cols-3">
-                {relatedWorks.map((rw) =>
-                  rw ? (
-                    <Link
-                      key={rw.id}
-                      href={`/gallery/${rw.id}`}
-                      className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
-                    >
-                      <div className="relative aspect-square overflow-hidden">
-                        <Image
-                          src={rw.src}
-                          alt={rw.title}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute left-3 top-3">
-                          <span className="rounded-full bg-foreground/70 px-3 py-1 text-xs font-medium text-background backdrop-blur-sm">
-                            {rw.category}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-card-foreground">{rw.title}</h3>
-                        <p className="mt-1 text-sm text-muted-foreground">{rw.artist}</p>
-                      </div>
-                    </Link>
-                  ) : null
-                )}
+            {/* Related works */}
+            {relatedWorks.length > 0 && (
+              <div className="mt-24">
+                <FadeIn>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">{"More Works"}</p>
+                  <h2 className="mt-4 text-3xl font-medium tracking-tight text-foreground">
+                    {"相关作品"}
+                  </h2>
+                </FadeIn>
+
+                <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                  {relatedWorks.map((rw, i) =>
+                    rw ? (
+                      <FadeIn key={rw.id} delay={i * 0.1}>
+                        <Link href={`/gallery/${rw.id}`} className="group block">
+                          <div className="image-card-hover relative aspect-4/3 overflow-hidden rounded-2xl">
+                            <Image
+                              src={rw.src}
+                              alt={rw.title}
+                              fill
+                              className="object-cover transition-all duration-700 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+                            <div className="absolute bottom-4 right-4 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+                                <ArrowRight className="h-3.5 w-3.5 text-white" />
+                              </span>
+                            </div>
+                          </div>
+                          <div className="py-5">
+                            <p className="mb-1 text-xs uppercase tracking-widest text-muted-foreground">{rw.category}</p>
+                            <h3 className="text-lg font-medium text-foreground">{rw.title}</h3>
+                            <p className="mt-1 text-sm text-muted-foreground">{rw.artist}</p>
+                          </div>
+                        </Link>
+                      </FadeIn>
+                    ) : null
+                  )}
+                </div>
               </div>
-            </section>
-          )}
-        </div>
+            )}
+          </div>
+        </PageTransition>
       </main>
       <SiteFooter />
     </div>

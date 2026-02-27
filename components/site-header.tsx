@@ -8,7 +8,6 @@ import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
-  { label: "首页", href: "/" },
   { label: "作品展览", href: "/gallery" },
   { label: "羌绣商城", href: "/shop" },
   { label: "技艺教程", href: "/tutorials" },
@@ -18,6 +17,7 @@ export default function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const isHome = pathname === "/"
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -27,54 +27,52 @@ export default function SiteHeader() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      <header
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-500",
+          "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-3xl transition-all duration-500",
           scrolled
-            ? "border-b border-border/50 bg-background/80 backdrop-blur-xl shadow-sm"
+            ? "bg-background/80 backdrop-blur-xl shadow-lg rounded-full"
             : "bg-transparent"
         )}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 lg:h-20 lg:px-8">
+        <div className={cn(
+          "flex items-center justify-between transition-all duration-300",
+          scrolled ? "px-4 py-2" : "px-2 pl-5 py-2"
+        )}>
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2.5">
-            <motion.div
-              whileHover={{ rotate: 8, scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20"
-            >
-              <span className="text-xl font-bold text-primary-foreground font-serif">
-                {"羌"}
-              </span>
-            </motion.div>
-            <span className="text-xl font-semibold text-foreground font-serif tracking-wide">
-              {"羌绣传承"}
-            </span>
+          <Link
+            href="/"
+            className={cn(
+              "text-lg font-medium tracking-tight transition-colors duration-300",
+              scrolled || !isHome ? "text-foreground" : "text-white"
+            )}
+          >
+            {"羌绣"}
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden items-center gap-1 md:flex" role="navigation" aria-label="Main navigation">
+          <nav className="hidden items-center gap-8 md:flex">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "relative rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                    "relative py-1 text-sm transition-colors",
                     isActive
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? (scrolled || !isHome ? "text-foreground" : "text-white")
+                      : (scrolled || !isHome ? "text-foreground/60 hover:text-foreground" : "text-white/70 hover:text-white")
                   )}
                 >
                   {item.label}
                   {isActive && (
-                    <motion.div
-                      layoutId="nav-indicator"
-                      className="absolute inset-0 rounded-lg bg-primary/8"
+                    <motion.span
+                      layoutId="nav-underline"
+                      className={cn(
+                        "absolute -bottom-0.5 left-0 right-0 h-[1.5px]",
+                        scrolled || !isHome ? "bg-foreground" : "bg-white"
+                      )}
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -83,30 +81,36 @@ export default function SiteHeader() {
             })}
           </nav>
 
-          {/* Mobile toggle */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground md:hidden"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
-          >
-            <AnimatePresence mode="wait">
-              {mobileMenuOpen ? (
-                <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <X className="h-5 w-5" />
-                </motion.div>
-              ) : (
-                <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Menu className="h-5 w-5" />
-                </motion.div>
+          {/* CTA */}
+          <div className="hidden items-center md:flex">
+            <Link
+              href="/shop"
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition-all rounded-full",
+                scrolled || !isHome
+                  ? "bg-foreground text-background hover:bg-foreground/90"
+                  : "bg-white text-foreground hover:bg-white/90"
               )}
-            </AnimatePresence>
-          </motion.button>
-        </div>
-      </motion.header>
+            >
+              {"探索商城"}
+            </Link>
+          </div>
 
-      {/* Mobile menu overlay */}
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={cn(
+              "transition-colors md:hidden",
+              scrolled || !isHome ? "text-foreground" : "text-white"
+            )}
+            aria-label={mobileMenuOpen ? "关闭菜单" : "打开菜单"}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
@@ -118,38 +122,40 @@ export default function SiteHeader() {
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.nav
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              initial={{ y: "-100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "-100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col bg-background px-6 pb-6 pt-20 shadow-2xl md:hidden"
-              role="navigation"
-              aria-label="Mobile navigation"
+              className="fixed left-1/2 -translate-x-1/2 top-20 z-50 w-[90%] max-w-3xl rounded-2xl bg-background p-6 shadow-2xl md:hidden"
             >
-              {navItems.map((item, i) => {
-                const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
-                return (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.08, duration: 0.3 }}
-                  >
+              <div className="flex flex-col gap-1">
+                <Link
+                  href="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "rounded-xl px-4 py-3 text-base font-medium transition-colors",
+                    pathname === "/" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  {"首页"}
+                </Link>
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
+                  return (
                     <Link
+                      key={item.href}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className={cn(
-                        "block rounded-lg px-4 py-4 text-lg font-medium transition-colors",
-                        isActive
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        "rounded-xl px-4 py-3 text-base font-medium transition-colors",
+                        isActive ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       )}
                     >
                       {item.label}
                     </Link>
-                  </motion.div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </motion.nav>
           </>
         )}

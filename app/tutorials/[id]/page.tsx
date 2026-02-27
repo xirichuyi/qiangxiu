@@ -1,204 +1,189 @@
+"use client"
+
 import Link from "next/link"
-import { notFound } from "next/navigation"
-import type { Metadata } from "next"
-import {
-  ArrowLeft,
-  Clock,
-  BookOpen,
-  ListOrdered,
-  Package,
-  Lightbulb,
-  Users,
-  Play,
-} from "lucide-react"
+import { useParams } from "next/navigation"
+import { motion } from "framer-motion"
+import { ArrowLeft, Clock, Play } from "lucide-react"
 import SiteHeader from "@/components/site-header"
 import SiteFooter from "@/components/site-footer"
 import { tutorials, getTutorialById } from "@/lib/data"
+import { FadeIn } from "@/components/motion"
+import { PageTransition } from "@/components/page-transition"
 
-export function generateStaticParams() {
-  return tutorials.map((t) => ({ id: t.id }))
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}): Promise<Metadata> {
-  const { id } = await params
+export default function TutorialDetailPage() {
+  const params = useParams()
+  const id = params.id as string
   const tutorial = getTutorialById(id)
-  if (!tutorial) return { title: "教程未找到 - 羌绣传承" }
-  return {
-    title: `${tutorial.title} - 技艺教程 - 羌绣传承`,
-    description: tutorial.description,
-  }
-}
 
-function LevelBadge({ level }: { level: string }) {
-  const colors: Record<string, string> = {
-    "入门": "bg-chart-5 text-primary-foreground",
-    "中级": "bg-accent text-accent-foreground",
-    "进阶": "bg-chart-4 text-foreground",
-    "高级": "bg-primary text-primary-foreground",
-    "文化": "bg-foreground text-background",
+  if (!tutorial) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+        <p className="text-muted-foreground">{"教程未找到"}</p>
+        <Link href="/tutorials" className="mt-4 text-sm text-foreground underline underline-offset-4">{"返回技艺教程"}</Link>
+      </div>
+    )
   }
-  return (
-    <span
-      className={`rounded-full px-3 py-1 text-xs font-semibold ${colors[level] || "bg-muted text-muted-foreground"}`}
-    >
-      {level}
-    </span>
-  )
-}
-
-export default async function TutorialDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const tutorial = getTutorialById(id)
-  if (!tutorial) notFound()
 
   const otherTutorials = tutorials.filter((t) => t.id !== tutorial.id).slice(0, 3)
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="flex-1">
-        <div className="mx-auto max-w-6xl px-4 py-8 lg:px-8">
-          {/* Breadcrumb */}
-          <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
-            <Link href="/tutorials" className="flex items-center gap-1.5 transition-colors hover:text-foreground">
-              <ArrowLeft className="h-4 w-4" />
-              {"返回技艺教程"}
-            </Link>
-            <span>{"/"}</span>
-            <span className="text-foreground line-clamp-1">{tutorial.title}</span>
-          </nav>
+      <main>
+        <PageTransition>
+          <div className="px-6 pt-32 pb-20 md:px-12 lg:px-20">
+            {/* Back link */}
+            <FadeIn>
+              <Link
+                href="/tutorials"
+                className="line-reveal inline-flex items-center gap-2 pb-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                {"返回技艺教程"}
+              </Link>
+            </FadeIn>
 
-          {/* Video Player - full width */}
-          <div className="overflow-hidden rounded-xl border border-border bg-foreground/5 shadow-sm">
-            <div className="relative aspect-video w-full">
-              <iframe
-                src={`//player.bilibili.com/player.html?bvid=${tutorial.bvid}&page=1&high_quality=1&danmaku=0`}
-                className="absolute inset-0 h-full w-full"
-                allowFullScreen
-                loading="lazy"
-                sandbox="allow-scripts allow-same-origin allow-popups"
-                title={tutorial.title}
-              />
-            </div>
-          </div>
-
-          {/* Title & Meta */}
-          <div className="mt-6 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <LevelBadge level={tutorial.level} />
-              <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                {tutorial.duration}
-              </span>
-              <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <BookOpen className="h-4 w-4" />
-                {"授课: "}{tutorial.teacher}
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-foreground font-serif sm:text-3xl">
-              {tutorial.title}
-            </h1>
-            <p className="max-w-3xl leading-relaxed text-muted-foreground">
-              {tutorial.description}
-            </p>
-          </div>
-
-          {/* Detail Cards */}
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
-            {/* Outline */}
-            <div className="rounded-xl border border-border bg-card p-6">
-              <div className="mb-4 flex items-center gap-2 text-foreground">
-                <ListOrdered className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold">{"课程大纲"}</h2>
-              </div>
-              <ol className="flex flex-col gap-3">
-                {tutorial.detail.outline.map((item, index) => (
-                  <li key={index} className="flex items-start gap-3 text-sm leading-relaxed text-muted-foreground">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                      {index + 1}
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Right Column */}
-            <div className="flex flex-col gap-6">
-              {/* Suitable for */}
-              <div className="rounded-xl border border-border bg-card p-6">
-                <div className="mb-3 flex items-center gap-2 text-foreground">
-                  <Users className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold">{"适合人群"}</h2>
+            {/* Video Player */}
+            <FadeIn className="mt-8">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="overflow-hidden rounded-2xl bg-muted"
+              >
+                <div className="relative aspect-video w-full">
+                  <iframe
+                    src={`//player.bilibili.com/player.html?bvid=${tutorial.bvid}&page=1&high_quality=1&danmaku=0`}
+                    className="absolute inset-0 h-full w-full"
+                    allowFullScreen
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin allow-popups"
+                    title={tutorial.title}
+                  />
                 </div>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {tutorial.detail.suitable}
-                </p>
-              </div>
+              </motion.div>
+            </FadeIn>
 
-              {/* Materials */}
-              <div className="rounded-xl border border-border bg-card p-6">
-                <div className="mb-3 flex items-center gap-2 text-foreground">
-                  <Package className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold">{"所需材料"}</h2>
+            {/* Title & Meta */}
+            <div className="mx-auto mt-12 max-w-3xl">
+              <FadeIn>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">
+                    {tutorial.level}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    {tutorial.duration}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {"授课: "}{tutorial.teacher}
+                  </span>
                 </div>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {tutorial.detail.materials}
+                <h1 className="mt-6 text-3xl font-medium tracking-tight text-foreground md:text-4xl">
+                  {tutorial.title}
+                </h1>
+                <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+                  {tutorial.description}
                 </p>
-              </div>
+              </FadeIn>
 
-              {/* Tips */}
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
-                <div className="mb-3 flex items-center gap-2 text-foreground">
-                  <Lightbulb className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold">{"学习小贴士"}</h2>
+              {/* Course Outline */}
+              <FadeIn delay={0.1} className="mt-12">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">{"Outline"}</p>
+                <h2 className="mt-4 text-xl font-medium text-foreground">{"课程大纲"}</h2>
+                <ol className="mt-6 flex flex-col gap-4">
+                  {tutorial.detail.outline.map((item, index) => (
+                    <motion.li
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 + index * 0.06 }}
+                      className="flex items-start gap-4 text-sm leading-relaxed text-muted-foreground"
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
+                        {index + 1}
+                      </span>
+                      {item}
+                    </motion.li>
+                  ))}
+                </ol>
+              </FadeIn>
+
+              {/* Info grid */}
+              <FadeIn delay={0.2} className="mt-12">
+                <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-3">
+                  <div className="bg-background p-6 transition-colors hover:bg-muted/50">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">{"适合人群"}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-foreground">
+                      {tutorial.detail.suitable}
+                    </p>
+                  </div>
+                  <div className="bg-background p-6 transition-colors hover:bg-muted/50">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">{"所需材料"}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-foreground">
+                      {tutorial.detail.materials}
+                    </p>
+                  </div>
+                  <div className="bg-background p-6 transition-colors hover:bg-muted/50">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">{"学习小贴士"}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-foreground">
+                      {tutorial.detail.tips}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {tutorial.detail.tips}
-                </p>
-              </div>
+              </FadeIn>
             </div>
-          </div>
 
-          {/* More Tutorials */}
-          {otherTutorials.length > 0 && (
-            <section className="mt-16 border-t border-border pt-12">
-              <h2 className="mb-6 text-2xl font-bold text-foreground font-serif">{"更多教程"}</h2>
-              <div className="grid gap-6 sm:grid-cols-3">
-                {otherTutorials.map((ot) => (
-                  <Link
-                    key={ot.id}
-                    href={`/tutorials/${ot.id}`}
-                    className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
-                  >
-                    <div className="relative flex aspect-video items-center justify-center bg-foreground/5">
-                      <Play className="h-10 w-10 text-primary/50 transition-colors group-hover:text-primary" />
-                    </div>
-                    <div className="p-4">
-                      <div className="mb-2 flex items-center gap-2">
-                        <LevelBadge level={ot.level} />
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          {ot.duration}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold text-card-foreground line-clamp-2">{ot.title}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{ot.teacher}</p>
-                    </div>
-                  </Link>
-                ))}
+            {/* More Tutorials */}
+            {otherTutorials.length > 0 && (
+              <div className="mt-24">
+                <FadeIn>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">{"More Tutorials"}</p>
+                  <h2 className="mt-4 text-3xl font-medium tracking-tight text-foreground">
+                    {"更多教程"}
+                  </h2>
+                </FadeIn>
+
+                <div className="mt-10 grid gap-6 sm:grid-cols-3">
+                  {otherTutorials.map((ot, i) => (
+                    <FadeIn key={ot.id} delay={i * 0.1}>
+                      <Link href={`/tutorials/${ot.id}`} className="group block">
+                        <div className="relative aspect-video overflow-hidden rounded-2xl bg-muted">
+                          <iframe
+                            src={`//player.bilibili.com/player.html?bvid=${ot.bvid}&page=1&high_quality=1&danmaku=0`}
+                            className="absolute inset-0 h-full w-full pointer-events-none"
+                            loading="lazy"
+                            sandbox="allow-scripts allow-same-origin allow-popups"
+                            title={ot.title}
+                          />
+                          {/* Play hover overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-500 group-hover:bg-black/20 pointer-events-none">
+                            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md scale-90 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
+                              <Play className="h-4 w-4 text-white ml-0.5" />
+                            </span>
+                          </div>
+                        </div>
+                        <div className="py-5">
+                          <div className="flex items-center gap-2">
+                            <span className="rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">
+                              {ot.level}
+                            </span>
+                            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {ot.duration}
+                            </span>
+                          </div>
+                          <h3 className="mt-3 text-lg font-medium text-foreground line-clamp-2">{ot.title}</h3>
+                          <p className="mt-1 text-sm text-muted-foreground">{ot.teacher}</p>
+                        </div>
+                      </Link>
+                    </FadeIn>
+                  ))}
+                </div>
               </div>
-            </section>
-          )}
-        </div>
+            )}
+          </div>
+        </PageTransition>
       </main>
       <SiteFooter />
     </div>

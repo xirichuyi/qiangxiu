@@ -1,145 +1,105 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import type { Metadata } from "next"
-import { ShoppingBag, Star } from "lucide-react"
+import { ShoppingBag, ArrowRight } from "lucide-react"
+import { motion } from "framer-motion"
 import SiteHeader from "@/components/site-header"
 import SiteFooter from "@/components/site-footer"
 import { products } from "@/lib/data"
+import { FadeIn } from "@/components/motion"
+import { PageTransition } from "@/components/page-transition"
 
-export const metadata: Metadata = {
-  title: "羌绣商城 - 羌绣传承",
-  description: "选购由非遗传承人手工制作的羌绣产品，手提包、靠垫、挂画、丝巾等，将千年技艺融入现代生活。",
-}
-
-function TagBadge({ tag }: { tag: string }) {
-  const colors: Record<string, string> = {
-    "热销": "bg-primary text-primary-foreground",
-    "新品": "bg-accent text-accent-foreground",
-    "收藏": "bg-foreground text-background",
-    "礼品": "bg-chart-5 text-primary-foreground",
-    "家居": "bg-chart-4 text-foreground",
-  }
+function ProductCard({ product, index }: { product: (typeof products)[0]; index: number }) {
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${colors[tag] || "bg-muted text-muted-foreground"}`}>
-      {tag}
-    </span>
-  )
-}
-
-function ProductCard({ product }: { product: (typeof products)[0] }) {
-  return (
-    <Link
-      href={`/shop/${product.id}`}
-      className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-lg"
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <Image
-          src={product.src}
-          alt={product.title}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute left-3 top-3">
-          <TagBadge tag={product.tag} />
-        </div>
-      </div>
-      <div className="flex flex-col gap-3 p-5">
-        <h3 className="text-lg font-semibold text-card-foreground">{product.title}</h3>
-        <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">
-          {product.description}
-        </p>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-0.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3.5 w-3.5 ${
-                  i < Math.floor(product.rating)
-                    ? "fill-chart-4 text-chart-4"
-                    : "fill-muted text-muted"
-                }`}
-              />
-            ))}
+      <Link href={`/shop/${product.id}`} className="group block">
+        <div className="image-card-hover relative aspect-3/4 overflow-hidden rounded-2xl">
+          <Image
+            src={product.src}
+            alt={product.title}
+            fill
+            className="object-cover transition-all duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+          <div className="absolute left-4 top-4">
+            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
+              {product.tag}
+            </span>
           </div>
-          <span className="text-xs text-muted-foreground">
-            {product.rating} ({product.reviews})
-          </span>
+          {/* Hover action buttons */}
+          <div className="absolute bottom-4 right-4 flex gap-2 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+              <ShoppingBag className="h-4 w-4 text-white" />
+            </span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+              <ArrowRight className="h-4 w-4 text-white" />
+            </span>
+          </div>
         </div>
-
-        {/* Price & Button */}
-        <div className="flex items-center justify-between border-t border-border pt-3">
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold text-primary">
+        <div className="py-5">
+          <h3 className="text-lg font-medium text-foreground">{product.title}</h3>
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-1">{product.description}</p>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-xl font-medium text-foreground transition-colors group-hover:text-primary">
               {"¥"}{product.price}
             </span>
             <span className="text-sm text-muted-foreground line-through">
               {"¥"}{product.originalPrice}
             </span>
           </div>
-          <span
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform group-hover:scale-105"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            <span className="hidden sm:inline">{"查看详情"}</span>
-          </span>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   )
 }
 
 function ShopContent() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 lg:px-8">
-      {/* Page Header */}
-      <div className="mb-12 text-center">
-        <h1 className="text-3xl font-bold text-foreground sm:text-4xl font-serif">
-          {"羌绣商城"}
-        </h1>
-        <p className="mx-auto mt-4 max-w-xl text-muted-foreground leading-relaxed">
-          {"每一件产品均由非遗传承人手工制作，从选料到成品，倾注匠心。让千年技艺走进您的日常生活。"}
-        </p>
-      </div>
+    <PageTransition>
+      <div className="px-6 pt-32 pb-20 md:px-12 lg:px-20">
+        <FadeIn className="mb-16">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">{"Shop"}</p>
+          <h1 className="mt-4 text-4xl font-medium tracking-tight text-foreground md:text-5xl lg:text-6xl">
+            {"羌绣商城"}
+          </h1>
+          <p className="mt-6 max-w-xl text-muted-foreground leading-relaxed">
+            {"每一件产品均由非遗传承人手工制作，从选料到成品，倾注匠心。让千年技艺走进您的日常生活。"}
+          </p>
+        </FadeIn>
 
-      {/* Info Banner */}
-      <div className="mb-10 flex flex-wrap items-center justify-center gap-6 rounded-xl border border-border bg-card px-6 py-4 text-sm text-muted-foreground">
-        <span className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-chart-5" />
-          {"手工制作"}
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-primary" />
-          {"非遗认证"}
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-accent" />
-          {"全国包邮"}
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-chart-4" />
-          {"七天无理由"}
-        </span>
-      </div>
+        {/* Service info */}
+        <FadeIn delay={0.1} className="mb-12">
+          <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+            {["手工制作", "非遗认证", "全国包邮", "七天无理由"].map((label) => (
+              <span key={label} className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-foreground" />
+                {label}
+              </span>
+            ))}
+          </div>
+        </FadeIn>
 
-      {/* Product Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {/* Product Grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
+          ))}
+        </div>
       </div>
-    </div>
+    </PageTransition>
   )
 }
 
 export default function ShopPage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
-      <main className="flex-1">
-        <ShopContent />
-      </main>
+      <main><ShopContent /></main>
       <SiteFooter />
     </div>
   )

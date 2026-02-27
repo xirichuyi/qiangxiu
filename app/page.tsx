@@ -1,244 +1,329 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, Palette, ShoppingBag, Play } from "lucide-react"
+import { ArrowRight, ArrowDown } from "lucide-react"
+import { motion, useScroll, useTransform } from "framer-motion"
+import { useRef } from "react"
 import SiteHeader from "@/components/site-header"
 import SiteFooter from "@/components/site-footer"
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion"
 
+/* ═══════════════════════════ Hero Section ═══════════════════════════ */
 function HeroSection() {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  })
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
   return (
-    <section className="relative overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <Image
-          src="/qiang-hero.jpg"
-          alt=""
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-foreground/60" />
-      </div>
-
-      <div className="relative mx-auto flex max-w-6xl flex-col items-center px-4 py-24 text-center lg:px-8 lg:py-40">
-        <span className="mb-6 inline-block rounded-full border border-primary-foreground/30 px-4 py-1.5 text-xs font-medium tracking-wide text-primary-foreground/90">
-          {"国家级非物质文化遗产"}
-        </span>
-
-        <h1 className="max-w-3xl text-balance text-3xl font-bold leading-tight text-primary-foreground sm:text-4xl md:text-5xl lg:text-6xl font-serif">
-          {"千年针线"}
-          <br />
-          <span className="text-primary">{"指尖传承"}</span>
-        </h1>
-
-        <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-primary-foreground/80 sm:text-lg">
-          {"羌绣，源自古老的羌族聚居地，以其精美的图案和丰富的色彩著称。每一针每一线，都承载着千年的文化记忆与民族智慧。"}
-        </p>
-
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/gallery"
-            className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-md transition-transform hover:scale-105"
-          >
-            {"探索作品"}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/tutorials"
-            className="flex items-center gap-2 rounded-lg border border-primary-foreground/30 px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
-          >
-            <Play className="h-4 w-4" />
-            {"观看教程"}
-          </Link>
+    <section ref={ref} className="relative bg-background">
+      <div className="sticky top-0 h-screen overflow-hidden">
+        <div className="flex h-full w-full items-center justify-center">
+          <motion.div className="relative w-full h-full" style={{ scale }}>
+            <Image
+              src="/qiang-hero.jpg"
+              alt="羌绣传承"
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Dark gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent" />
+            <motion.div className="absolute inset-0 flex items-end overflow-hidden" style={{ opacity: heroOpacity }}>
+              <h1 className="w-full text-[18vw] font-medium leading-[0.85] tracking-tighter text-white pb-4 pl-4 md:pl-8">
+                {"羌绣传承".split("").map((char, i) => (
+                  <span
+                    key={i}
+                    className="inline-block animate-[slideUp_0.8s_ease-out_forwards] opacity-0"
+                    style={{ animationDelay: `${0.3 + i * 0.12}s` }}
+                  >
+                    {char}
+                  </span>
+                ))}
+              </h1>
+            </motion.div>
+            {/* Scroll indicator */}
+            <motion.div
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+              style={{ opacity: heroOpacity }}
+            >
+              <span className="text-xs uppercase tracking-widest text-white/60">{"Scroll"}</span>
+              <ArrowDown className="h-4 w-4 text-white/60 animate-[scrollBounce_2s_ease-in-out_infinite]" />
+            </motion.div>
+          </motion.div>
         </div>
+      </div>
+      <div className="h-[100vh]" />
+      <div className="px-6 pt-32 pb-28 md:pt-48 md:px-12 md:pb-36 lg:px-20 lg:pt-56 lg:pb-44">
+        <FadeIn>
+          <p className="mx-auto max-w-2xl text-center text-2xl leading-relaxed text-muted-foreground md:text-3xl lg:text-[2.5rem] lg:leading-snug">
+            {"千年针线，指尖传承。"}
+            <br />
+            {"来自云朵上的民族艺术。"}
+          </p>
+        </FadeIn>
       </div>
     </section>
   )
 }
 
-function SectionCards() {
-  const sections = [
-    {
-      title: "作品展览",
-      description: "浏览精美的羌绣传统作品，感受牡丹、凤凰、羊角纹等经典图案的艺术魅力。",
-      href: "/gallery",
-      image: "/qiang-work-1.jpg",
-      icon: <Palette className="h-5 w-5" />,
-    },
-    {
-      title: "羌绣商城",
-      description: "选购由非遗传承人手工制作的羌绣产品，将千年技艺融入现代生活。",
-      href: "/shop",
-      image: "/qiang-product-1.jpg",
-      icon: <ShoppingBag className="h-5 w-5" />,
-    },
-    {
-      title: "技艺教程",
-      description: "跟随视频教程，学习羌绣的基础针法与配色技巧，亲手体验这门古老技艺。",
-      href: "/tutorials",
-      image: "/qiang-artisan.jpg",
-      icon: <Play className="h-5 w-5" />,
-    },
+/* ═══════════════════════════ Featured Products ═══════════════════════════ */
+function FeaturedProducts() {
+  return (
+    <section className="bg-background">
+      <div className="relative px-6 py-20 md:px-12 lg:px-20">
+        <FadeIn className="text-center mb-16">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">{"探索羌绣"}</p>
+          <h2 className="mt-6 text-3xl font-medium tracking-tight text-foreground md:text-4xl lg:text-5xl">
+            {"作品与商城"}
+          </h2>
+        </FadeIn>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FadeIn direction="left">
+            <Link href="/gallery" className="group block">
+              <div className="image-card-hover relative aspect-4/3 overflow-hidden rounded-2xl">
+                <Image
+                  src="/qiang-work-1.jpg"
+                  alt="作品展览"
+                  fill
+                  className="object-cover transition-all duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+                <div className="absolute bottom-6 left-6">
+                  <span className="backdrop-blur-md px-4 py-2 text-sm font-medium rounded-full bg-white/20 text-white transition-all group-hover:bg-white/30">
+                    {"作品展览"}
+                  </span>
+                </div>
+                <div className="absolute bottom-6 right-6 translate-x-4 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100">
+                  <ArrowRight className="h-5 w-5 text-white" />
+                </div>
+              </div>
+            </Link>
+          </FadeIn>
+          <FadeIn direction="right">
+            <Link href="/shop" className="group block">
+              <div className="image-card-hover relative aspect-4/3 overflow-hidden rounded-2xl">
+                <Image
+                  src="/qiang-product-1.jpg"
+                  alt="羌绣商城"
+                  fill
+                  className="object-cover transition-all duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+                <div className="absolute bottom-6 left-6">
+                  <span className="backdrop-blur-md px-4 py-2 text-sm font-medium rounded-full bg-white/20 text-white transition-all group-hover:bg-white/30">
+                    {"羌绣商城"}
+                  </span>
+                </div>
+                <div className="absolute bottom-6 right-6 translate-x-4 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100">
+                  <ArrowRight className="h-5 w-5 text-white" />
+                </div>
+              </div>
+            </Link>
+          </FadeIn>
+        </div>
+
+        <FadeIn className="mt-20 text-center">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">{"国家级非物质文化遗产"}</p>
+          <p className="mx-auto mt-8 max-w-2xl leading-relaxed text-muted-foreground text-2xl md:text-3xl text-center">
+            {"羌绣以其独特的挑花技法闻名，图案取材于自然万物。牡丹象征富贵、羊角纹代表吉祥、云纹寓意平安。"}
+          </p>
+        </FadeIn>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════ Culture Section ═══════════════════════════ */
+function CultureSection() {
+  const items = [
+    { src: "/qiang-work-2.jpg", label: "传统技艺", title: "十字挑花绣" },
+    { src: "/qiang-work-3.jpg", label: "经典图案", title: "凤穿牡丹" },
+    { src: "/qiang-artisan.jpg", label: "匠人精神", title: "非遗传承人" },
   ]
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-20 lg:px-8">
-      <div className="mb-12 text-center">
-        <h2 className="text-2xl font-bold text-foreground sm:text-3xl font-serif">
-          {"探索羌绣世界"}
+    <section className="bg-background">
+      <FadeIn className="px-6 py-20 text-center md:px-12 md:py-28 lg:px-20 lg:py-32 lg:pb-20">
+        <h2 className="text-3xl font-medium tracking-tight text-foreground md:text-4xl lg:text-5xl">
+          {"千年技艺，"}
+          <br />
+          {"指尖上的传承。"}
         </h2>
-        <p className="mt-3 text-muted-foreground">
-          {"从欣赏、收藏到学习，全方位感受羌绣之美"}
-        </p>
-      </div>
+        <p className="mx-auto mt-6 max-w-md text-sm text-muted-foreground">{"文化溯源"}</p>
+      </FadeIn>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {sections.map((section) => (
-          <Link
-            key={section.title}
-            href={section.href}
-            className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
-          >
-            <div className="relative h-52 overflow-hidden">
+      <StaggerContainer className="grid grid-cols-1 gap-4 px-6 pb-20 md:grid-cols-3 md:px-12 lg:px-20">
+        {items.map((item) => (
+          <StaggerItem key={item.title} className="group cursor-pointer">
+            <div className="image-card-hover relative aspect-4/3 overflow-hidden rounded-2xl">
               <Image
-                src={section.image}
-                alt={section.title}
+                src={item.src}
+                alt={item.title}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                className="object-cover transition-all duration-700 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
             </div>
-            <div className="p-6">
-              <div className="mb-3 flex items-center gap-2 text-primary">
-                {section.icon}
-                <h3 className="text-lg font-semibold text-card-foreground">{section.title}</h3>
-              </div>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {section.description}
-              </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors group-hover:text-accent">
-                {"了解更多"}
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            <div className="py-6">
+              <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">{item.label}</p>
+              <h3 className="text-foreground text-xl font-medium">{item.title}</h3>
+            </div>
+          </StaggerItem>
+        ))}
+      </StaggerContainer>
+    </section>
+  )
+}
+
+/* ═══════════════════════════ Gallery Strip ═══════════════════════════ */
+function GalleryStrip() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  })
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"])
+
+  const images = [
+    { src: "/qiang-work-1.jpg", alt: "牡丹富贵图" },
+    { src: "/qiang-work-2.jpg", alt: "羊角云纹绣片" },
+    { src: "/qiang-work-3.jpg", alt: "凤穿牡丹" },
+    { src: "/qiang-work-4.jpg", alt: "菱形腰带绣" },
+    { src: "/qiang-work-5.jpg", alt: "鸳鸯戏莲" },
+    { src: "/qiang-work-6.jpg", alt: "团花绣样" },
+  ]
+
+  return (
+    <section ref={containerRef} className="relative bg-background overflow-hidden py-20">
+      <FadeIn className="px-6 mb-12 md:px-12 lg:px-20">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{"Selected Works"}</p>
+        <h2 className="text-3xl font-medium tracking-tight text-foreground md:text-4xl">
+          {"精选作品"}
+        </h2>
+      </FadeIn>
+
+      <motion.div className="flex gap-6 px-6" style={{ x }}>
+        {images.map((img) => (
+          <div
+            key={img.alt}
+            className="group relative h-[60vh] w-[75vw] shrink-0 overflow-hidden rounded-2xl md:w-[50vw] lg:w-[35vw]"
+          >
+            <Image src={img.src} alt={img.alt} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+            <div className="absolute bottom-6 left-6 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+              <span className="backdrop-blur-md px-4 py-2 text-sm font-medium rounded-full bg-white/20 text-white">
+                {img.alt}
               </span>
             </div>
-          </Link>
+          </div>
         ))}
-      </div>
-    </section>
-  )
-}
+      </motion.div>
 
-function CultureSection() {
-  return (
-    <section className="border-y border-border bg-card">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-12 px-4 py-20 lg:flex-row lg:px-8">
-        <div className="flex-1">
-          <span className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            {"文化溯源"}
-          </span>
-          <h2 className="text-2xl font-bold text-foreground sm:text-3xl font-serif">
-            {"来自云朵上的民族"}
-          </h2>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            {"羌族是中国最古老的民族之一，主要聚居在四川省阿坝藏族羌族自治州。羌绣作为羌族文化的重要组成部分，已有数千年的历史。"}
-          </p>
-          <p className="mt-3 leading-relaxed text-muted-foreground">
-            {"羌绣以其独特的挑花技法闻名，图案取材于自然万物 —— 牡丹象征富贵、羊角纹代表吉祥、云纹寓意平安。2008年，羌族刺绣被列入国家级非物质文化遗产名录。"}
-          </p>
-          <Link
-            href="/gallery"
-            className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-accent"
-          >
-            {"欣赏经典作品"}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="relative w-full max-w-md overflow-hidden rounded-xl lg:w-[420px]">
-          <Image
-            src="/qiang-artisan.jpg"
-            alt="Qiang embroidery artisan at work"
-            width={420}
-            height={520}
-            className="h-auto w-full rounded-xl object-cover"
-          />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function FeaturedWorks() {
-  const works = [
-    { id: "2", src: "/qiang-work-2.jpg", title: "羊角云纹绣片", tag: "传统纹样" },
-    { id: "3", src: "/qiang-work-3.jpg", title: "凤穿牡丹", tag: "经典图案" },
-    { id: "5", src: "/qiang-work-5.jpg", title: "鸳鸯戏莲", tag: "婚嫁绣品" },
-    { id: "6", src: "/qiang-work-6.jpg", title: "团花绣样", tag: "装饰纹样" },
-  ]
-
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-20 lg:px-8">
-      <div className="mb-12 flex items-end justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground sm:text-3xl font-serif">
-            {"精选作品"}
-          </h2>
-          <p className="mt-2 text-muted-foreground">{"匠心独运，针线成画"}</p>
-        </div>
+      <FadeIn className="px-6 mt-12 md:px-12 lg:px-20">
         <Link
           href="/gallery"
-          className="hidden items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-accent sm:flex"
-        >
-          {"查看全部"}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {works.map((work) => (
-          <Link
-            key={work.title}
-            href={`/gallery/${work.id}`}
-            className="group relative overflow-hidden rounded-lg"
-          >
-            <div className="relative aspect-square overflow-hidden">
-              <Image
-                src={work.src}
-                alt={work.title}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              <div className="absolute bottom-0 left-0 right-0 translate-y-full p-4 transition-transform group-hover:translate-y-0">
-                <span className="mb-1 inline-block rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                  {work.tag}
-                </span>
-                <p className="text-sm font-medium text-primary-foreground">{work.title}</p>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      <div className="mt-6 text-center sm:hidden">
-        <Link
-          href="/gallery"
-          className="inline-flex items-center gap-1 text-sm font-medium text-primary"
+          className="line-reveal inline-flex items-center gap-2 pb-1 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
         >
           {"查看全部作品"}
           <ArrowRight className="h-4 w-4" />
         </Link>
+      </FadeIn>
+    </section>
+  )
+}
+
+/* ═══════════════════════════ Stats ═══════════════════════════ */
+function StatsSection() {
+  const stats = [
+    { label: "历史", value: "3000年+" },
+    { label: "传承人", value: "200位+" },
+    { label: "针法", value: "50种+" },
+    { label: "非遗认证", value: "2008年" },
+  ]
+
+  return (
+    <section className="bg-background">
+      <div className="grid grid-cols-2 border-t border-border md:grid-cols-4">
+        {stats.map((stat, i) => (
+          <FadeIn key={stat.label} delay={i * 0.08}>
+            <div className="border-b border-r border-border p-10 text-center last:border-r-0 md:border-b-0 transition-colors hover:bg-muted/50">
+              <p className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">{stat.label}</p>
+              <p className="font-medium text-foreground text-3xl md:text-4xl">{stat.value}</p>
+            </div>
+          </FadeIn>
+        ))}
       </div>
     </section>
   )
 }
 
+/* ═══════════════════════════ Editorial ═══════════════════════════ */
+function EditorialSection() {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  })
+  const imgScale = useTransform(scrollYProgress, [0, 1], [1.1, 1])
+
+  return (
+    <section ref={ref} className="bg-background">
+      <FadeIn className="px-6 py-24 md:px-12 md:py-32 lg:px-20 lg:py-40">
+        <p className="mx-auto max-w-5xl text-2xl font-medium leading-snug md:text-3xl lg:text-[2.5rem] lg:leading-snug text-foreground">
+          {"羌族是中国最古老的民族之一，主要聚居在四川省阿坝藏族羌族自治州。羌绣作为羌族文化的重要组成部分，以其精美的图案和丰富的色彩，承载着千年的文化记忆与民族智慧。"}
+        </p>
+      </FadeIn>
+
+      <div className="relative aspect-video w-full overflow-hidden">
+        <motion.div className="relative w-full h-full" style={{ scale: imgScale }}>
+          <Image src="/qiang-artisan.jpg" alt="羌绣传承人" fill className="object-cover" />
+        </motion.div>
+        <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════ Tutorials CTA ═══════════════════════════ */
+function TutorialsCTA() {
+  return (
+    <FadeIn className="bg-background px-6 py-24 text-center md:px-12 md:py-32 lg:px-20">
+      <p className="text-xs uppercase tracking-widest text-muted-foreground">{"学习羌绣"}</p>
+      <h2 className="mt-6 text-3xl font-medium tracking-tight text-foreground md:text-4xl lg:text-5xl">
+        {"跟随非遗传承人，"}
+        <br />
+        {"亲手体验千年技艺。"}
+      </h2>
+      <Link
+        href="/tutorials"
+        className="mt-10 inline-flex items-center gap-2 rounded-full bg-foreground px-8 py-3 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:gap-3"
+      >
+        {"浏览教程"}
+        <ArrowRight className="h-4 w-4" />
+      </Link>
+    </FadeIn>
+  )
+}
+
+/* ═══════════════════════════ Page ═══════════════════════════ */
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
       <main>
         <HeroSection />
-        <SectionCards />
+        <FeaturedProducts />
         <CultureSection />
-        <FeaturedWorks />
+        <GalleryStrip />
+        <StatsSection />
+        <EditorialSection />
+        <TutorialsCTA />
       </main>
       <SiteFooter />
     </div>

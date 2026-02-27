@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Noto_Sans_SC, Noto_Serif_SC } from "next/font/google"
 import "./globals.css"
+import { ClientLayout } from "@/components/client-layout"
 
 const notoSansSC = Noto_Sans_SC({
   subsets: ["latin"],
@@ -39,7 +40,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" className={`${notoSansSC.variable} ${notoSerifSC.variable} antialiased`}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <ClientLayout>{children}</ClientLayout>
+      </body>
     </html>
   )
 }
