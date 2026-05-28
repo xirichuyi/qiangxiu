@@ -31,6 +31,7 @@ export default function SiteFooter() {
                   { href: "/gallery", label: "作品展览" },
                   { href: "/shop", label: "羌绣商城" },
                   { href: "/tutorials", label: "技艺教程" },
+                  { href: "/artisans", label: "传承匠人" },
                 ].map((item) => (
                   <Link
                     key={item.href}
@@ -46,21 +47,45 @@ export default function SiteFooter() {
             {/* About */}
             <div className="flex flex-col gap-4">
               <p className="text-xs uppercase tracking-widest text-muted-foreground">{"关于"}</p>
-              <div className="flex flex-col gap-3 text-sm text-foreground/70">
-                <span>{"国家级非物质文化遗产"}</span>
-                <span>{"2008年列入名录"}</span>
-                <span>{"3000年传承历史"}</span>
-              </div>
+              <nav className="flex flex-col gap-3" aria-label="About links">
+                {[
+                  { href: "/about", label: "关于羌绣" },
+                  { href: "/about/history", label: "历史溯源" },
+                  { href: "/about/techniques", label: "刺绣技法" },
+                  { href: "/news", label: "新闻动态" },
+                  { href: "/events", label: "文化活动" },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="line-reveal text-sm text-foreground/70 pb-0.5 transition-colors hover:text-foreground"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
             </div>
 
-            {/* Contact */}
+            {/* Service */}
             <div className="flex flex-col gap-4">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">{"联系"}</p>
-              <div className="flex flex-col gap-3 text-sm text-foreground/70">
-                <span>{"四川省阿坝藏族羌族自治州"}</span>
-                <span>{"qiangxiu@heritage.cn"}</span>
-                <span>{"028-8888-8888"}</span>
-              </div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">{"服务"}</p>
+              <nav className="flex flex-col gap-3" aria-label="Service links">
+                {[
+                  { href: "/custom", label: "定制服务" },
+                  { href: "/faq", label: "常见问题" },
+                  { href: "/contact", label: "联系我们" },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="line-reveal text-sm text-foreground/70 pb-0.5 transition-colors hover:text-foreground"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <span className="text-sm text-foreground/70">{"qiangxiu@heritage.cn"}</span>
+                <span className="text-sm text-foreground/70">{"028-8888-8888"}</span>
+              </nav>
             </div>
           </div>
         </FadeIn>

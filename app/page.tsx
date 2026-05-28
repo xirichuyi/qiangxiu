@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, ArrowDown } from "lucide-react"
+import { ArrowRight, ArrowDown, Calendar, MapPin } from "lucide-react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { useRef } from "react"
 import SiteHeader from "@/components/site-header"
 import SiteFooter from "@/components/site-footer"
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion"
+import { artisans, newsArticles, events } from "@/lib/data"
 
 /* ═══════════════════════════ Hero Section ═══════════════════════════ */
 function HeroSection() {
@@ -290,6 +291,139 @@ function EditorialSection() {
   )
 }
 
+/* ═══════════════════════════ Artisans Section ═══════════════════════════ */
+function ArtisansSection() {
+  const featured = artisans.slice(0, 4)
+
+  return (
+    <section className="bg-background">
+      <div className="px-6 py-20 md:px-12 md:py-28 lg:px-20">
+        <FadeIn className="mb-16 flex items-end justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">{"Artisans"}</p>
+            <h2 className="mt-4 text-3xl font-medium tracking-tight text-foreground md:text-4xl">{"传承匠人"}</h2>
+          </div>
+          <Link
+            href="/artisans"
+            className="line-reveal hidden items-center gap-2 pb-1 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground sm:inline-flex"
+          >
+            {"全部匠人"} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </FadeIn>
+
+        <StaggerContainer className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {featured.map((artisan) => (
+            <StaggerItem key={artisan.id}>
+              <Link href={`/artisans/${artisan.id}`} className="group block">
+                <div className="image-card-hover relative aspect-3/4 overflow-hidden rounded-2xl">
+                  <Image src={artisan.src} alt={artisan.name} fill className="object-cover transition-all duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <h3 className="text-base font-medium text-white">{artisan.name}</h3>
+                    <p className="text-xs text-white/70">{artisan.title}</p>
+                  </div>
+                </div>
+              </Link>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════ News Section ═══════════════════════════ */
+function NewsSection() {
+  const latest = newsArticles.slice(0, 3)
+
+  return (
+    <section className="bg-background">
+      <div className="px-6 py-20 md:px-12 md:py-28 lg:px-20">
+        <FadeIn className="mb-16 flex items-end justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">{"News"}</p>
+            <h2 className="mt-4 text-3xl font-medium tracking-tight text-foreground md:text-4xl">{"最新动态"}</h2>
+          </div>
+          <Link
+            href="/news"
+            className="line-reveal hidden items-center gap-2 pb-1 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground sm:inline-flex"
+          >
+            {"全部资讯"} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </FadeIn>
+
+        <StaggerContainer className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {latest.map((article) => (
+            <StaggerItem key={article.id}>
+              <Link href={`/news/${article.id}`} className="group block">
+                <div className="image-card-hover relative aspect-4/3 overflow-hidden rounded-2xl">
+                  <Image src={article.src} alt={article.title} fill className="object-cover transition-all duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+                  <div className="absolute top-4 left-4">
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">{article.category}</span>
+                  </div>
+                </div>
+                <div className="py-5">
+                  <span className="text-xs text-muted-foreground">{article.date}</span>
+                  <h3 className="mt-1 text-base font-medium text-foreground leading-snug">{article.title}</h3>
+                </div>
+              </Link>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </div>
+    </section>
+  )
+}
+
+/* ═══════════════════════════ Events Section ═══════════════════════════ */
+function EventsSection() {
+  const upcoming = events.filter((e) => e.status === "报名中").slice(0, 2)
+  if (upcoming.length === 0) return null
+
+  return (
+    <section className="bg-background">
+      <div className="px-6 py-20 md:px-12 md:py-28 lg:px-20">
+        <FadeIn className="mb-16 flex items-end justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">{"Events"}</p>
+            <h2 className="mt-4 text-3xl font-medium tracking-tight text-foreground md:text-4xl">{"近期活动"}</h2>
+          </div>
+          <Link
+            href="/events"
+            className="line-reveal hidden items-center gap-2 pb-1 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground sm:inline-flex"
+          >
+            {"全部活动"} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </FadeIn>
+
+        <StaggerContainer className="grid gap-6 sm:grid-cols-2">
+          {upcoming.map((event) => (
+            <StaggerItem key={event.id}>
+              <Link href={`/events/${event.id}`} className="group block rounded-2xl border border-border overflow-hidden transition-colors hover:bg-muted/30">
+                <div className="image-card-hover relative aspect-video overflow-hidden">
+                  <Image src={event.src} alt={event.title} fill className="object-cover transition-all duration-700 group-hover:scale-105" />
+                  <div className="absolute top-4 left-4">
+                    <span className="rounded-full bg-green-600 px-3 py-1 text-xs font-medium text-white">{event.status}</span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-medium text-foreground">{event.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{event.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {event.date}</span>
+                    <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {event.location}</span>
+                  </div>
+                </div>
+              </Link>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </div>
+    </section>
+  )
+}
+
 /* ═══════════════════════════ Tutorials CTA ═══════════════════════════ */
 function TutorialsCTA() {
   return (
@@ -323,6 +457,9 @@ export default function HomePage() {
         <GalleryStrip />
         <StatsSection />
         <EditorialSection />
+        <ArtisansSection />
+        <NewsSection />
+        <EventsSection />
         <TutorialsCTA />
       </main>
       <SiteFooter />

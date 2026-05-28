@@ -4,13 +4,15 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Search, ShoppingBag, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { label: "作品展览", href: "/gallery" },
   { label: "羌绣商城", href: "/shop" },
   { label: "技艺教程", href: "/tutorials" },
+  { label: "传承匠人", href: "/artisans" },
+  { label: "关于羌绣", href: "/about" },
 ]
 
 export default function SiteHeader() {
@@ -81,18 +83,37 @@ export default function SiteHeader() {
             })}
           </nav>
 
-          {/* CTA */}
-          <div className="hidden items-center md:flex">
+          {/* Right icons */}
+          <div className="hidden items-center gap-1 md:flex">
             <Link
-              href="/shop"
+              href="/search"
               className={cn(
-                "px-4 py-2 text-sm font-medium transition-all rounded-full",
-                scrolled || !isHome
-                  ? "bg-foreground text-background hover:bg-foreground/90"
-                  : "bg-white text-foreground hover:bg-white/90"
+                "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+                scrolled || !isHome ? "text-foreground/60 hover:text-foreground hover:bg-muted" : "text-white/70 hover:text-white hover:bg-white/10"
               )}
+              aria-label="搜索"
             >
-              {"探索商城"}
+              <Search className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/cart"
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+                scrolled || !isHome ? "text-foreground/60 hover:text-foreground hover:bg-muted" : "text-white/70 hover:text-white hover:bg-white/10"
+              )}
+              aria-label="购物车"
+            >
+              <ShoppingBag className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/user/profile"
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+                scrolled || !isHome ? "text-foreground/60 hover:text-foreground hover:bg-muted" : "text-white/70 hover:text-white hover:bg-white/10"
+              )}
+              aria-label="个人中心"
+            >
+              <User className="h-4 w-4" />
             </Link>
           </div>
 
