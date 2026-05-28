@@ -12,6 +12,7 @@ const navItems = [
   { label: "羌绣商城", href: "/shop" },
   { label: "技艺教程", href: "/tutorials" },
   { label: "传承匠人", href: "/artisans" },
+  { label: "三维体验馆", href: "/showcase" },
   { label: "关于羌绣", href: "/about" },
 ]
 

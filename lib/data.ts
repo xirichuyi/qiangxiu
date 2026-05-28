@@ -1137,3 +1137,42 @@ export function getEventById(id: string) {
 export function getOrderById(id: string) {
   return mockOrders.find((o) => o.id === id)
 }
+
+// ============ 16 Stitches (针法) ============
+// 每种针法配一组 PBR 材质参数，用于三维体验馆切换时模拟光泽差异。
+// color: 线材主色；roughness: 粗糙度(越低越亮)；metalness: 金属感；
+// sheen: 织物光泽(0-1)；displacement: 凸起程度(模拟绣线高度)。
+export type Stitch = {
+  id: string
+  name: string
+  category: "挑绣" | "刺绣" | "扎绣" | "辅助"
+  description: string
+  color: string
+  roughness: number
+  metalness: number
+  sheen: number
+  displacement: number
+}
+
+export const stitches: Stitch[] = [
+  { id: "s01", name: "十字挑花", category: "挑绣", description: "最核心的羌绣技法，以等长十字针组成几何纹样，线迹规整对称。", color: "#A02C2C", roughness: 0.65, metalness: 0.05, sheen: 0.6, displacement: 0.18 },
+  { id: "s02", name: "串挑", category: "挑绣", description: "在十字挑基础上线迹相连串接，形成连续线条，多用于边花。", color: "#B83A3A", roughness: 0.58, metalness: 0.04, sheen: 0.55, displacement: 0.20 },
+  { id: "s03", name: "编挑", category: "挑绣", description: "经纬交织如编织，线面更厚实，立体感较强。", color: "#8B2424", roughness: 0.7, metalness: 0.06, sheen: 0.5, displacement: 0.25 },
+  { id: "s04", name: "纳花绣", category: "刺绣", description: "又称扎花，叠层平铺，色彩清秀明丽，常配以柔和过渡。", color: "#D4A03A", roughness: 0.4, metalness: 0.1, sheen: 0.8, displacement: 0.10 },
+  { id: "s05", name: "纤花绣", category: "刺绣", description: "针脚细密如丝，绣面平整明亮，多用于精致饰品。", color: "#F0C75B", roughness: 0.32, metalness: 0.12, sheen: 0.85, displacement: 0.08 },
+  { id: "s06", name: "撇花绣", category: "刺绣", description: "平绣针法，针线平铺均匀，绣面平整光洁。", color: "#E8B847", roughness: 0.38, metalness: 0.08, sheen: 0.78, displacement: 0.09 },
+  { id: "s07", name: "勾花绣", category: "扎绣", description: "链子扣针法，环环相扣形成链状线条，刚健淳朴粗犷豪放。", color: "#2B4159", roughness: 0.55, metalness: 0.05, sheen: 0.6, displacement: 0.22 },
+  { id: "s08", name: "织字绣", category: "扎绣", description: "提花技法，可在绣面上呈现文字或符号纹样。", color: "#1A1A1A", roughness: 0.62, metalness: 0.04, sheen: 0.5, displacement: 0.16 },
+  { id: "s09", name: "长短针", category: "辅助", description: "针脚长短错落，多用于晕染色彩、表现层次过渡。", color: "#C26A2C", roughness: 0.45, metalness: 0.08, sheen: 0.7, displacement: 0.12 },
+  { id: "s10", name: "扣针", category: "辅助", description: "扣边针法，常用于绣品收边或锁边处理。", color: "#5A3120", roughness: 0.6, metalness: 0.05, sheen: 0.55, displacement: 0.14 },
+  { id: "s11", name: "掺针", category: "辅助", description: "将两色或多色线掺合绣制，色彩过渡自然柔和。", color: "#9B6B3D", roughness: 0.5, metalness: 0.07, sheen: 0.65, displacement: 0.11 },
+  { id: "s12", name: "柳针", category: "辅助", description: "针迹细长如柳叶，多用于叶脉、藤蔓等细节。", color: "#3F5A3F", roughness: 0.52, metalness: 0.06, sheen: 0.62, displacement: 0.10 },
+  { id: "s13", name: "齐针", category: "辅助", description: "针脚平齐均匀，多用于花瓣、叶片的平铺绣制。", color: "#E07B7B", roughness: 0.42, metalness: 0.08, sheen: 0.72, displacement: 0.10 },
+  { id: "s14", name: "打籽绣", category: "辅助", description: "线在针上绕圈后扎入布面形成小颗粒，立体且富有质感。", color: "#F5F1E8", roughness: 0.75, metalness: 0.03, sheen: 0.4, displacement: 0.32 },
+  { id: "s15", name: "盘金绣", category: "辅助", description: "金属丝线盘旋钉绣，金光闪耀，多用于高规格绣品。", color: "#D4AF37", roughness: 0.18, metalness: 0.85, sheen: 0.95, displacement: 0.14 },
+  { id: "s16", name: "锁边针", category: "辅助", description: "锁链状边缘针法，常用于绣品收口和云云鞋鞋面边缘。", color: "#6B8C6B", roughness: 0.55, metalness: 0.06, sheen: 0.58, displacement: 0.16 },
+]
+
+export function getStitchById(id: string) {
+  return stitches.find((s) => s.id === id)
+}
