@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { stitches, type Stitch } from "@/lib/data"
 import SiteHeader from "@/components/site-header"
 import SiteFooter from "@/components/site-footer"
+import ErrorBoundary from "@/components/error-boundary"
 import { cn } from "@/lib/utils"
 
 const ShowcaseCanvas = dynamic(() => import("@/components/showcase-3d"), {
@@ -61,7 +62,9 @@ export default function ShowcasePage() {
                   "radial-gradient(ellipse at center, #2a1a1a 0%, #1a0f0f 60%, #0a0606 100%)",
               }}
             >
-              <ShowcaseCanvas stitch={stitch} />
+              <ErrorBoundary label="ShowcaseCanvas">
+                <ShowcaseCanvas stitch={stitch} />
+              </ErrorBoundary>
 
               {/* 当前针法浮层 */}
               <div className="absolute left-4 bottom-4 max-w-[60%] rounded-2xl backdrop-blur-md bg-black/40 text-white px-4 py-3 pointer-events-none">
