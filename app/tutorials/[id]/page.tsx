@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
@@ -43,7 +44,7 @@ export default function TutorialDetailPage() {
               </Link>
             </FadeIn>
 
-            {/* Video Player */}
+            {/* Video Player with poster fallback */}
             <FadeIn className="mt-8">
               <motion.div
                 initial={{ opacity: 0, scale: 0.97 }}
@@ -52,14 +53,36 @@ export default function TutorialDetailPage() {
                 className="overflow-hidden rounded-2xl bg-muted"
               >
                 <div className="relative aspect-video w-full">
+                  {/* Bottom layer: cover poster (visible while iframe loads) */}
+                  <Image
+                    src={tutorial.cover}
+                    alt={tutorial.title}
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 1024px"
+                  />
+                  {/* Top layer: Bilibili player */}
                   <iframe
-                    src={`//player.bilibili.com/player.html?bvid=${tutorial.bvid}&page=1&high_quality=1&danmaku=0`}
+                    src={`https://player.bilibili.com/player.html?bvid=${tutorial.bvid}&page=1&high_quality=1&danmaku=0&autoplay=0`}
                     className="absolute inset-0 h-full w-full"
-                    allowFullScreen
+                    allow="fullscreen"
+                    referrerPolicy="no-referrer"
                     loading="lazy"
-                    sandbox="allow-scripts allow-same-origin allow-popups"
                     title={tutorial.title}
                   />
+                </div>
+                {/* Source attribution under the player */}
+                <div className="flex items-center justify-between bg-foreground/5 px-4 py-2 text-xs text-muted-foreground">
+                  <span>{"视频来源: Bilibili · "}{tutorial.teacher}</span>
+                  <a
+                    href={`https://www.bilibili.com/video/${tutorial.bvid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline-offset-2 hover:underline hover:text-foreground"
+                  >
+                    {"在 B 站打开"}
+                  </a>
                 </div>
               </motion.div>
             </FadeIn>
@@ -149,16 +172,23 @@ export default function TutorialDetailPage() {
                     <FadeIn key={ot.id} delay={i * 0.1}>
                       <Link href={`/tutorials/${ot.id}`} className="group block">
                         <div className="relative aspect-video overflow-hidden rounded-2xl bg-muted">
+                          <Image
+                            src={ot.cover}
+                            alt={ot.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, 33vw"
+                          />
                           <iframe
-                            src={`//player.bilibili.com/player.html?bvid=${ot.bvid}&page=1&high_quality=1&danmaku=0`}
+                            src={`https://player.bilibili.com/player.html?bvid=${ot.bvid}&page=1&high_quality=1&danmaku=0&autoplay=0`}
                             className="absolute inset-0 h-full w-full pointer-events-none"
                             loading="lazy"
-                            sandbox="allow-scripts allow-same-origin allow-popups"
+                            referrerPolicy="no-referrer"
+                            allow="fullscreen"
                             title={ot.title}
                           />
-                          {/* Play hover overlay */}
                           <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-500 group-hover:bg-black/20 pointer-events-none">
-                            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md scale-90 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
+                            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/25 backdrop-blur-md ring-1 ring-white/30 scale-90 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
                               <Play className="h-4 w-4 text-white ml-0.5" />
                             </span>
                           </div>

@@ -1,8 +1,8 @@
 "use client"
 
-import { use } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { ArrowLeft, Package, Truck, CheckCircle, CreditCard, Hammer } from "lucide-react"
 import { FadeIn } from "@/components/motion"
@@ -21,8 +21,8 @@ function getStepIndex(status: string) {
   return idx >= 0 ? idx : 0
 }
 
-export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function OrderDetailPage() {
+  const { id } = useParams<{ id: string }>()
   const order = getOrderById(id)
 
   if (!order) {

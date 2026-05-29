@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Clock, ArrowRight, Play } from "lucide-react"
@@ -28,18 +29,29 @@ function VideoCard({ tutorial, index }: { tutorial: (typeof tutorials)[0]; index
         href={`/tutorials/${tutorial.id}`}
         className="group block"
       >
-        {/* Video embed with play overlay */}
+        {/* Video embed with poster fallback */}
         <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-muted">
+          {/* Bottom layer: cover poster (visible while iframe loads or if it fails) */}
+          <Image
+            src={tutorial.cover}
+            alt={tutorial.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, 50vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+          {/* Top layer: Bilibili player */}
           <iframe
-            src={`//player.bilibili.com/player.html?bvid=${tutorial.bvid}&page=1&high_quality=1&danmaku=0`}
+            src={`https://player.bilibili.com/player.html?bvid=${tutorial.bvid}&page=1&high_quality=1&danmaku=0&autoplay=0`}
             className="absolute inset-0 h-full w-full pointer-events-none"
             loading="lazy"
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            referrerPolicy="no-referrer"
+            allow="fullscreen"
             title={tutorial.title}
           />
           {/* Hover play overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-500 group-hover:bg-black/20 pointer-events-none">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-md scale-90 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/25 backdrop-blur-md ring-1 ring-white/30 scale-90 opacity-0 transition-all duration-500 group-hover:scale-100 group-hover:opacity-100">
               <Play className="h-5 w-5 text-white ml-0.5" />
             </span>
           </div>

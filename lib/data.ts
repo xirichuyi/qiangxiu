@@ -292,7 +292,8 @@ export const products = [
 export const tutorials = [
   {
     id: "1",
-    bvid: "BV1GJ411x7h7",
+    bvid: "BV1M7411w7gy",
+    cover: "/qiang-work-2.jpg",
     title: "羌绣入门 -- 十字挑花基础针法",
     description:
       "十字挑花是羌绣最核心的技法。学习十字挑、串挑、编挑三种基本挑花方式，手把手教你入门羌绣。",
@@ -316,7 +317,8 @@ export const tutorials = [
   },
   {
     id: "2",
-    bvid: "BV1aS4y1P76q",
+    bvid: "BV1Q7m7BDEVz",
+    cover: "/qiang-work-3.jpg",
     title: "羌绣配色艺术 -- 云朵上民族的色彩智慧",
     description:
       "羌族被称为\"云朵上的民族\"。讲解羌绣传统配色规律：黑白对比的朴素大方与五色丝线的虹霓绚丽。",
@@ -340,7 +342,8 @@ export const tutorials = [
   },
   {
     id: "3",
-    bvid: "BV1Kb411W7aK",
+    bvid: "BV1Nx4y11729",
+    cover: "/qiang-work-4.jpg",
     title: "经典图案绣制 -- 云纹与万字纹",
     description:
       "云纹象征吉祥平安，万字纹代表太阳崇拜与永恒。详细演示这两种羌绣核心纹样的绣制全过程。",
@@ -364,7 +367,8 @@ export const tutorials = [
   },
   {
     id: "4",
-    bvid: "BV1WE411A7E7",
+    bvid: "BV16v42117Rt",
+    cover: "/qiang-work-1.jpg",
     title: "高级针法 -- 纳花绣与勾花绣",
     description:
       "纳花（扎花）清秀明丽，勾花（链子扣）刚健淳朴。学习这两种进阶针法的绣制技巧与应用场景。",
@@ -388,7 +392,8 @@ export const tutorials = [
   },
   {
     id: "5",
-    bvid: "BV1CJ411Y7eR",
+    bvid: "BV1dwMFz8ETj",
+    cover: "/qiang-work-5.jpg",
     title: "羌绣在现代生活中的应用",
     description:
       "从蓝牙耳机套到手机壳，看传承人如何将千年羌绣融入现代日用品设计。包含实操教学。",
@@ -412,7 +417,8 @@ export const tutorials = [
   },
   {
     id: "6",
-    bvid: "BV1hE411M7mq",
+    bvid: "BV1ty6jBZEFX",
+    cover: "/qiang-hero.jpg",
     title: "走进羌绣 -- 穿在身上的史诗",
     description:
       "羌绣被誉为\"穿在身上的史诗\"。走进四川阿坝，听传承人讲述三千年羌绣的前世今生与震后重生。",
