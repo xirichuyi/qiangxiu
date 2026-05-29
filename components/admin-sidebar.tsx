@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { logout } from "@/lib/admin-auth"
 import {
   LayoutDashboard,
   BarChart3,
@@ -16,6 +17,7 @@ import {
   Package,
   UserCog,
   Settings,
+  LogOut,
   Menu,
   X,
 } from "lucide-react"
@@ -56,11 +58,17 @@ const navGroups = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [open, setOpen] = useState(false)
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin"
     return pathname.startsWith(href)
+  }
+
+  function handleLogout() {
+    logout()
+    router.replace("/admin/login")
   }
 
   const sidebarContent = (
@@ -106,6 +114,21 @@ export function AdminSidebar() {
           </div>
         ))}
       </nav>
+
+      {/* Logout */}
+      <div className="border-t px-3 py-3">
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false)
+            handleLogout()
+          }}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          退出登录
+        </button>
+      </div>
     </div>
   )
 

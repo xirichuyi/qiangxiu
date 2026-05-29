@@ -1,9 +1,10 @@
 "use client"
 
-import type { ReactNode } from "react"
-import { usePathname } from "next/navigation"
+import { useEffect, useState, type ReactNode } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { isLoggedIn } from "@/lib/admin-auth"
 
 const pageTitles: Record<string, string> = {
   "/admin": "仪表盘",
@@ -29,6 +30,36 @@ function getPageTitle(pathname: string): string {
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const [authed, setAuthed] = useState<boolean | null>(null)
+
+  const isLoginPage = pathname === "/admin/login"
+
+  useEffect(() => {
+    if (isLoginPage) {
+      setAuthed(true)
+      return
+    }
+    const ok = isLoggedIn()
+    setAuthed(ok)
+    if (!ok) router.replace("/admin/login")
+  }, [pathname, router, isLoginPage])
+
+  // Login page renders without sidebar/header chrome
+  if (isLoginPage) return <>{children}</>
+
+  // While checking, render a minimal loader to avoid flash
+  if (authed === null) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-muted/30 text-sm text-muted-foreground">
+        正在验证身份…
+      </div>
+    )
+  }
+
+  // Not authed: redirect already in flight, render nothing
+  if (!authed) return null
+
   const title = getPageTitle(pathname)
 
   return (
